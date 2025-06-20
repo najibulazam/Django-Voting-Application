@@ -1,0 +1,1 @@
+# e_voting/templatetags/__init__.py

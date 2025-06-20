@@ -1,0 +1,53 @@
+{% extends 'core/base.html' %}
+{% load math_filters %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+  <!-- Sidebar -->
+  <div class="col-lg-4 mb-4">
+    <div class="card shadow">
+      <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+        <span>Vote Statistics</span>
+        <a href="{% url 'result' %}" class="btn btn-warning btn-sm">
+          Result <i class="fa-solid fa-arrow-up-right-from-square"></i>
+        </a>
+      </div>
+      <div class="card-body">
+        {% for position in positions %}
+          <h6 class="mt-3">{{ position.name }}</h6>
+          {% for c in position.candidate_set.all %}
+            {% with vote_count=c.vote_set.count total=position.vote_set.count %}
+              <small>{{ c.name }} ({{ vote_count }} votes)</small>
+              <div class="progress mb-2">
+                <div class="progress-bar" role="progressbar"
+                     style="width: {{ vote_count|vote_percentage:total|floatformat:'1' }}%;">
+                  {{ vote_count|vote_percentage:total|floatformat:'1' }}%
+                </div>
+              </div>
+            {% endwith %}
+          {% endfor %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Poll List -->
+  <div class="col-lg-8">
+    <h3 class="mb-4">Available Polls</h3>
+    {% for pos in positions %}
+      <div class="card mb-3 shadow-sm">
+        <div class="card-body d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">{{ pos.name }}</h5>
+          {% if pos.id in voted_positions %}
+            <span class="badge bg-success">Voted</span>
+          {% else %}
+            <a href="{% url 'vote_position' pos.id %}" class="btn btn-primary btn-sm">Vote</a>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

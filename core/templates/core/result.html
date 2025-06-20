@@ -1,0 +1,32 @@
+{% extends 'core/base.html' %}
+{% block title %}Results{% endblock %}
+
+{% block content %}
+<h2 class="mb-4 text-center">Election Results</h2>
+
+{% if results %}
+  {% for group in results %}
+    <div class="card shadow mb-4">
+      <div class="card-header bg-dark text-white">
+        {{ group.position.name }}
+      </div>
+      <div class="card-body">
+        {% for c in group.stats %}
+          <p class="{% if forloop.first %}fw-bold text-success{% endif %}">
+            {{ c.candidate.name }} — {{ c.votes }} vote(s) ({{ c.percentage|floatformat:1 }}%)
+          </p>
+          <div class="progress mb-2">
+            <div class="progress-bar {% if forloop.first %}bg-success{% else %}bg-secondary{% endif %} progress-bar-striped progress-bar-animated"
+                 role="progressbar"
+                 style="width: {{ c.percentage }}%;">
+              {{ c.percentage|floatformat:1 }}%
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endfor %}
+{% else %}
+  <p class="text-center text-muted">No results available yet.</p>
+{% endif %}
+{% endblock %}

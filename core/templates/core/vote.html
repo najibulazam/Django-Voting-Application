@@ -1,0 +1,25 @@
+{% extends 'core/base.html' %}
+{% block title %}Vote - {{ position.name }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-4">
+  <div class="col-md-8">
+    <div class="card shadow">
+      <div class="card-header bg-success text-white">
+        <h5>Vote for {{ position.name }}</h5>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          {% for c in candidates %}
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="candidate" value="{{ c.id }}" id="cand{{ c.id }}" required>
+              <label class="form-check-label" for="cand{{ c.id }}">{{ c.name }}</label>
+            </div>
+          {% endfor %}
+          <button type="submit" class="btn btn-success w-100 mt-3">Submit Vote</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
