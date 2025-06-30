@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import Position, Candidate, Vote
+from .forms import StudentRegisterForm, StudentLoginForm
 
 def welcome(request):
     if request.user.is_authenticated:
@@ -13,9 +15,25 @@ def welcome(request):
 def user_register(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
-    form = UserCreationForm(request.POST or None)
+    form = StudentRegisterForm(request.POST or None)
     if form.is_valid():
-        user = form.save()
+        student_id = form.cleaned_data['student_id']
+        if User.objects.filter(username=student_id).exists():
+            messages.success(request, 'An account with this Student ID already exists.')
+            return render(request, 'core/account_exists.html')
+        email = form.cleaned_data['email']
+        password = form.cleaned_data['password1']
+        nickname = form.cleaned_data['nickname']
+
+        user = User.objects.create_user(username=student_id)
+        user.set_password(password)
+        user.save()
+
+        user.profile.student_id = student_id
+        user.profile.email = email
+        user.profile.nickname = nickname
+        user.profile.save()
+
         login(request, user)
         return redirect('dashboard')
     return render(request, 'core/register.html', {'form': form})
@@ -23,11 +41,24 @@ def user_register(request):
 def user_login(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
-    form = AuthenticationForm(request, data=request.POST or None)
-    if form.is_valid():
-        user = form.get_user()
-        login(request, user)
-        return redirect('dashboard')
+
+    form = StudentLoginForm(request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        student_id = form.cleaned_data['student_id']
+        password = form.cleaned_data['password']
+
+        try:
+            user = User.objects.get(username=student_id)
+        except User.DoesNotExist:
+            user = None
+
+        if user:
+            user = authenticate(username=user.username, password=password)
+            if user:
+                login(request, user)
+                return redirect('dashboard')
+        messages.error(request, 'Invalid student ID or password')
+
     return render(request, 'core/login.html', {'form': form})
 
 def user_logout(request):
@@ -37,11 +68,24 @@ def user_logout(request):
 @login_required
 def dashboard(request):
     positions = Position.objects.all()
-    voted_positions = Vote.objects.filter(user=request.user).values_list('position_id', flat=True)
+
+    # Get the user's votes
+    votes = Vote.objects.filter(user=request.user)
+    voted_positions = votes.values_list('position_id', flat=True)
+
+    # Create a dictionary to map position.id -> candidate.id the user voted for
+    voted_candidates = {vote.position_id: vote.candidate_id for vote in votes}
+
+    # Attach candidate list to each position manually to use in template
+    for pos in positions:
+        pos.candidates = Candidate.objects.filter(position=pos)
+
     return render(request, 'core/dashboard.html', {
         'positions': positions,
-        'voted_positions': voted_positions
+        'voted_candidates': voted_candidates,
+        'voted_positions': voted_positions,
     })
+
 
 @login_required
 def vote_position(request, position_id):

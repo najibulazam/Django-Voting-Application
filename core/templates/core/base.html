@@ -47,7 +47,7 @@
             </button>
 
             {% if user.is_authenticated %}
-            <span class="navbar-text">{{ user.username|upper }}</span>
+            <span class="navbar-text">{{ request.user.username|upper }} ({{ request.user.profile.nickname|upper }})</span>
             <a href="{% url 'logout' %}" class="btn btn-danger btn-sm"
               >Logout</a
             >
