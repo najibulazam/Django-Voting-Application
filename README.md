@@ -1,12 +1,13 @@
 # 🗳️ Django Voting Application
 
-A simple, responsive web-based voting platform built with Django and Bootstrap. Users can register, log in, vote for candidates, and view real-time animated results with percentage bars.
+A simple, responsive web-based voting platform built with Django and Bootstrap. Users can register using Student ID, email, nickname, log in, vote for candidates, and view real-time animated results with percentage bars.
 
 ---
 
 ## 🚀 Features
 
-- ✅ User registration & authentication
+- ✅ Student registration with nickname, email & password
+- ✅ Login with 7-digit Student ID and password
 - ✅ Vote once per position (enforced at DB level)
 - ✅ Clean Bootstrap 5 UI with dark mode toggle
 - ✅ Real-time vote percentage display
@@ -14,19 +15,21 @@ A simple, responsive web-based voting platform built with Django and Bootstrap. 
 - ✅ Admin panel for managing positions, candidates, votes
 - ✅ Custom Django template filter for vote percentage
 - ✅ Font Awesome icons integration
+- ✅ Displays nickname in dashboard and votes list
 
 ---
 
 ## 📁 Project Structure
 
 ```
-
 voting_project/
 ├── core/
 │   ├── templates/core/         # HTML templates
-│   ├── templatetags/           # Custom filters (e.g., vote\_percentage)
-│   ├── admin.py                # Model registration
-│   ├── models.py               # Position, Candidate, Vote
+│   ├── templatetags/           # Custom filters (e.g., vote_percentage)
+│   ├── static/                 # Static files (CSS/JS/icons)
+│   ├── forms.py                # Custom forms with validation and placeholders
+│   ├── admin.py                # Model registration with nickname display
+│   ├── models.py               # Position, Candidate, Vote, Profile
 │   ├── views.py                # App logic
 │   └── urls.py                 # App routing
 ├── voting_project/
@@ -34,8 +37,7 @@ voting_project/
 ├── db.sqlite3                  # Default database
 ├── manage.py
 └── requirements.txt
-
-````
+```
 
 ---
 
@@ -46,7 +48,7 @@ voting_project/
 ```bash
 git clone https://github.com/najibulazam/Django-Voting-Application.git
 cd Django-Voting-Application
-````
+```
 
 ### 2. Create & activate virtual environment
 
@@ -84,7 +86,7 @@ python manage.py runserver
 
 ## 🧪 Test Credentials
 
-You can create a superuser to access the admin dashboard at `/admin`. Regular users can register via `/register`.
+You can create a superuser to access the admin dashboard at `/admin`. Regular users can register via `/register` with Student ID, email, nickname, and password.
 
 ---
 
@@ -108,7 +110,7 @@ Once logged in as superuser, you can manage:
 
 * Positions
 * Candidates
-* Votes
+* Votes (shows student ID and nickname)
 
 ---
 
